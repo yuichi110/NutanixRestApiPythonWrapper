@@ -35,65 +35,55 @@ def test_login():
 ### Cluster
 ###
 
-def test_cluster_all():
-  test_get_cluster_info()
-  test_get_cluster_name()
-  test_get_hypervisor()
-  test_get_version()
-  test_get_name_servers()
-  test_get_ntp_servers()
-  test_block_serials()
-  test_get_num_nodes()
-  test_get_desired_redundancy_factor()
-  test_get_current_redundancy_factor()
+def test_cluster_all(session):
+  test_get_cluster_info(session)
+  test_get_cluster_name(session)
+  test_get_hypervisor(session)
+  test_get_version(session)
+  test_get_name_servers(session)
+  test_get_ntp_servers(session)
+  test_block_serials(session)
+  test_get_num_nodes(session)
+  test_get_desired_redundancy_factor(session)
+  test_get_current_redundancy_factor(session)
 
-def test_get_cluster_info():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_cluster_info(session):
   result = session.get_cluster_info()
   print(result)
 
-def test_get_cluster_name():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_cluster_name(session):
   result = session.get_cluster_name()
   print(result)
 
-def test_get_hypervisor():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_hypervisor(session):
   result = session.get_hypervisor()
   print(result)
 
-def test_get_version():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_version(session):
   result = session.get_version()
   print(result)
 
-def test_get_name_servers():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_name_servers(session):
   result = session.get_name_servers()
   print(result)
 
-def test_get_ntp_servers():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_ntp_servers(session):
   result = session.get_ntp_servers()
   print(result)
 
-def test_block_serials():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_block_serials(session):
   result = session.get_block_serials()
   print(result)
 
-def test_get_num_nodes():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_num_nodes(session):
   result = session.get_num_nodes()
   print(result)
 
-def test_get_desired_redundancy_factor():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_desired_redundancy_factor(session):
   result = session.get_desired_redundancy_factor()
   print(result)
 
-def test_get_current_redundancy_factor():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_current_redundancy_factor(session):
   result = session.get_current_redundancy_factor()
   print(result)
 
@@ -101,30 +91,26 @@ def test_get_current_redundancy_factor():
 ### Container
 ###
 
-def test_container_all():
-  #test_get_container_names()
-  test_get_container_info()
-  #test_create_container()
-  #test_delete_container()
-  #test_get_container_names()
+def test_container_all(session):
+  #test_get_container_names(session)
+  test_get_container_info(session)
+  #test_create_container(session)
+  #test_delete_container(session)
+  #test_get_container_names(session)
 
-def test_get_container_names():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_container_names(session):
   result = session.get_container_names()
   print(result)
 
-def test_get_container_info():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_container_info(session):
   result = session.get_container_info('container')
   print(result)
 
 def test_create_container():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
   result = session.create_container('yuichi-container')
   print(result)
 
-def test_delete_container():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_delete_container(session):
   result = session.delete_container('yuichi-container')
   print(result)
 
@@ -132,41 +118,36 @@ def test_delete_container():
 ### Network
 ###
 
-def test_network_all():
-  #test_get_network_names()
-  #test_get_network_info()
-  #test_create_network()
-  test_create_network_managed()
-  #test_is_network_used()
-  #test_delete_network()
+def test_network_all(session):
+  test_get_network_names(session)
+  #test_get_network_info(session)
+  #test_create_network(session)
+  #test_create_network_managed(session)
+  #test_is_network_used(session)
+  #test_delete_network(session)
 
-def test_get_network_names():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_network_names(session):
+
   result = session.get_network_names()
   print(result)
 
-def test_get_network_info():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_network_info(session):
   result = session.get_network_info('Net-10.149')
   print(result)
 
-def test_create_network():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_create_network(session):
   result = session.create_network('yuichi-network', 110)
   print(result)
 
-def test_is_network_used():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_is_network_used(session):
   result = session.is_network_used('vlan.0')
   print(result)
 
-def test_create_network_managed():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_create_network_managed(session):
   result = session.create_network_managed('Net-10.149', 0, '10.149.0.0', 17, '10.149.0.1', [('10.149.27.50', '10.149.27.199')], '8.8.8.8')
   print(result)
 
-def test_delete_network():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_delete_network(session):
   result = session.delete_network('Net-10.149')
   print(result)
 
@@ -175,23 +156,20 @@ def test_delete_network():
 ### VM
 ###
 
-def test_vm_all():
-  #test_get_vm_names()
-  #test_create_vm_from_image()
-  test_get_vm_info()
+def test_vm_all(session):
+  #test_get_vm_names(session)
+  #test_create_vm_from_image(session)
+  test_get_vm_info(session)
 
-def test_get_vm_names():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_vm_names(session):
   result = session.get_vm_names()
   print(result)
 
-def test_get_vm_info():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_vm_info(session):
   result = session.get_vm_info('rest_test')
   print(result)
 
-def test_create_vm_from_image():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_create_vm_from_image(session):
   result = session.create_vm_from_image('rest_test', 2048, 1, 2, 'REST_CENT7_IMG', 'REST_NETWORK')
   print(result)
 
@@ -200,9 +178,8 @@ def test_create_vm_from_image():
 ### vDisk
 ###
 
-def test_get_vm_disks():
+def test_get_vm_disks(session):
   VM = 'REST_TEST_VM'
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
   result = session.get_vm_disks(VM)
   print(result)
 
@@ -211,29 +188,25 @@ def test_get_vm_disks():
 ### Image
 ###
 
-def test_image_all():
-  #test_get_image_names()
-  #test_upload_image()
-  #test_create_image_from_vm_vdisk()
-  test_delete_image()
+def test_image_all(session):
+  #test_get_image_names(session)
+  #test_upload_image(session)
+  #test_create_image_from_vm_vdisk(session)
+  test_delete_image(session)
 
-def test_get_image_names():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_image_names(session):
   result = session.get_image_names()
   print(result)
 
-def test_upload_image():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_upload_image(session):
   result = session.upload_image('nfs://10.149.245.50/Public/bootcamp/centos7_min_raw', 'container', 'cent7-image-rest')
   print(result)
 
-def test_create_image_from_vm_vdisk():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_create_image_from_vm_vdisk(session):
   result = session.create_image_from_vm_vdisk('rest_test', 'scsi.0', 'container', 'cent7-image-rest2')
   print(result)
 
-def test_delete_image():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_delete_image(session):
   result = session.delete_image('cent7-image-rest2')
   print(result)
 
@@ -241,21 +214,21 @@ def test_delete_image():
 ### Task
 ###
 
-def test_task_all():
-  #test_upload_image()
-  #test_get_task_status()
-  test_get_tasks_status()
+def test_task_all(session):
+  #test_upload_image(session)
+  #test_get_task_status(session)
+  test_get_tasks_status(session)
 
-def test_get_task_status():
+def test_get_task_status(session):
   TASK_UUID = 'f25cbedf-ca76-491a-aa20-e1fe77a92f42'
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
   result = session.get_task_status(TASK_UUID)
   print(result)
 
-def test_get_tasks_status():
-  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD)
+def test_get_tasks_status(session):
   result = session.get_tasks_status()
   print(result)
 
 if __name__ == '__main__':
-  test_task_all()
+  logger = NutanixRestApiClient.create_logger('test_rest.log', logging.DEBUG)
+  session = NutanixRestApiClient(CLUSTER_IP, CLUSTER_USER, CLUSTER_PASSWORD, logger)
+  test_upload_image(session)

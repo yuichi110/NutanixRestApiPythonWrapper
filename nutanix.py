@@ -1,6 +1,5 @@
 '''
 Python wrapper for Nutanix REST API.
-Version 0.01
 
 Author: Yuichi Ito
 Email: yuichi.ito@nutanix.com
@@ -10,13 +9,24 @@ import requests
 import json
 import traceback
 import logging
+import datetime
 
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
 
 class NutanixRestApiClient:
-  def __init__(self, ip, username, password, timeout_connection=2, timeout_read=5):
+
+  @staticmethod
+  def create_logger(log_file, level=logging.INFO):
+      logger = logging.getLogger('NutanixRestApiClientLogger')
+      logger.setLevel(level)
+      handler = logging.FileHandler(log_file)  
+      handler.setFormatter(logging.Formatter('%(message)s'))
+      logger.addHandler(handler)
+      return logger
+
+  def __init__(self, ip, username, password, logger=None, timeout_connection=2, timeout_read=5):
     TIMEOUT = (timeout_connection, timeout_read)
 
     # Test IP and Port reachability
@@ -50,9 +60,55 @@ class NutanixRestApiClient:
     if not resp.ok:
       raise Exception('Able to access. But unable to get cluster info. Please check your credential.')
 
+
+    ###
+    ### Debug utility for CRUD functions
+    ###
+
+    def logging_rest(response):
+      if logger is None:
+        return
+      logger.info('======== {} ========'.format(datetime.datetime.now()))
+      logger.info('\n * Request * \n')
+      logger.info('{} {}'.format(response.request.method, response.request.url))
+      for (key, value) in response.request.headers.items():
+        logger.debug('{}: {}'.format(key, value))
+      logger.debug('')
+      if response.request.body:
+        try:
+          indented_json = json.dumps(json.loads(response.request.body), indent=2)
+          logger.info(indented_json)
+        except:
+          logger.info(response.request.body)
+      logger.info('')
+
+      logger.info('\n * Response * \n')
+      logger.info('{}'.format(response.status_code))
+      for (key, value) in response.headers.items():
+        logger.debug('{}: {}'.format(key, value))
+      logger.debug('')
+      if response.text:
+        try:
+          indented_json = json.dumps(json.loads(response.text), indent=2)
+          logger.info(indented_json)
+        except:
+          logger.info(response.request.text)
+      logger.info('\n\n')
+
+
+    def logging_error(error_dict):
+      if logger is None:
+        return
+      logger.error('======== {} ========'.format(datetime.datetime.now()))
+      logger.error(error_dict['error'])
+      if 'stacktrace' in error_dict:
+        logger.error('')
+        logger.error(error_dict['stacktrace'])
+      logger.error('\n\n')
+
     ###
     ### Make CRUD utility private methods with closure.
-    ### To avoid being modifyied session and ip etc from outside of instance.
+    ### To avoid being modifyied session and ip etc from outside.
     ###
 
     # API v0.8
@@ -60,6 +116,7 @@ class NutanixRestApiClient:
     def get_v08(url, error_dict):
       if not url.startswith('/'): url = '/' + url
       response = session.get('https://{}:9440/api/nutanix/v0.8{}'.format(ip, url), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
@@ -71,7 +128,8 @@ class NutanixRestApiClient:
 
     def post_v08(url, body_dict, error_dict):
       if not url.startswith('/'): url = '/' + url
-      response = session.post('https://{}:9440/api/nutanix/v0.8{}'.format(ip, url), data=json.dumps(body_dict), timeout=TIMEOUT)
+      response = session.post('https://{}:9440/api/nutanix/v0.8{}'.format(ip, url), data=json.dumps(body_dict, indent=2), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
@@ -83,7 +141,8 @@ class NutanixRestApiClient:
 
     def put_v08(url, body_dict, error_dict):
       if not url.startswith('/'): url = '/' + url
-      response = session.put('https://{}:9440/api/nutanix/v0.8{}'.format(ip, url), data=json.dumps(body_dict), timeout=TIMEOUT)
+      response = session.put('https://{}:9440/api/nutanix/v0.8{}'.format(ip, url), data=json.dumps(body_dict, indent=2), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
@@ -96,6 +155,7 @@ class NutanixRestApiClient:
     def delete_v08(url, error_dict):
       if not url.startswith('/'): url = '/' + url
       response = session.delete('https://{}:9440/api/nutanix/v0.8{}'.format(ip, url), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
@@ -114,6 +174,7 @@ class NutanixRestApiClient:
     def get_v1(url, error_dict):
       if not url.startswith('/'): url = '/' + url
       response = session.get('https://{}:9440/api/nutanix/v1{}'.format(ip, url), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
@@ -125,7 +186,8 @@ class NutanixRestApiClient:
 
     def post_v1(url, body_dict, error_dict):
       if not url.startswith('/'): url = '/' + url
-      response = session.post('https://{}:9440/api/nutanix/v1{}'.format(ip, url), data=json.dumps(body_dict), timeout=TIMEOUT)
+      response = session.post('https://{}:9440/api/nutanix/v1{}'.format(ip, url), data=json.dumps(body_dict, indent=2), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
@@ -137,7 +199,8 @@ class NutanixRestApiClient:
 
     def put_v1(url, body_dict, error_dict):
       if not url.startswith('/'): url = '/' + url
-      response = session.put('https://{}:9440/api/nutanix/v1{}'.format(ip, url), data=json.dumps(body_dict), timeout=TIMEOUT)
+      response = session.put('https://{}:9440/api/nutanix/v1{}'.format(ip, url), data=json.dumps(body_dict, indent=2), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
@@ -150,6 +213,7 @@ class NutanixRestApiClient:
     def delete_v1(url, error_dict):
       if not url.startswith('/'): url = '/' + url
       response = session.delete('https://{}:9440/api/nutanix/v1{}'.format(ip, url), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
@@ -168,6 +232,7 @@ class NutanixRestApiClient:
     def get_v2(url, error_dict):
       if not url.startswith('/'): url = '/' + url
       response = session.get('https://{}:9440/api/nutanix/v2.0{}'.format(ip, url), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
@@ -179,7 +244,8 @@ class NutanixRestApiClient:
 
     def post_v2(url, body_dict, error_dict):
       if not url.startswith('/'): url = '/' + url
-      response = session.post('https://{}:9440/api/nutanix/v2.0{}'.format(ip, url), data=json.dumps(body_dict), timeout=TIMEOUT)
+      response = session.post('https://{}:9440/api/nutanix/v2.0{}'.format(ip, url), data=json.dumps(body_dict, indent=2), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
@@ -191,7 +257,8 @@ class NutanixRestApiClient:
 
     def put_v2(url, body_dict, error_dict):
       if not url.startswith('/'): url = '/' + url
-      response = session.put('https://{}:9440/api/nutanix/v2.0{}'.format(ip, url), data=json.dumps(body_dict), timeout=TIMEOUT)
+      response = session.put('https://{}:9440/api/nutanix/v2.0{}'.format(ip, url), data=json.dumps(body_dict, indent=2), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
@@ -204,14 +271,13 @@ class NutanixRestApiClient:
     def delete_v2(url, error_dict):
       if not url.startswith('/'): url = '/' + url
       response = session.delete('https://{}:9440/api/nutanix/v2.0{}'.format(ip, url), timeout=TIMEOUT)
+      logging_rest(response)
       if not response.ok:
         error_dict['method'] = response.request.method
         error_dict['url'] = response.request.url
         error_dict['code'] = response.status_code
         error_dict['text'] = response.text
         raise IntendedException('Receive unexpected response code "{}".'.format(response.status_code))
-
-      # sometimes get nothing.
       try:
         return response.json()
       except:
@@ -222,9 +288,10 @@ class NutanixRestApiClient:
     # Error handling
 
     def handle_error(error, error_dict):
+      error_dict['error'] = str(error)
       if not isinstance(error, IntendedException):
         error_dict['stacktrace'] = traceback.format_exc()
-      error_dict['error'] = str(error)
+      logging_error(error_dict)
     self._handle_error = handle_error
 
 
@@ -938,6 +1005,23 @@ class NutanixRestApiClient:
   ### Task Operation
   ###
 
+  def get_task_status(self, task_uuid):
+    error_dict = {}
+    try:
+      response_dict = self._get_v08('/tasks/{}'.format(task_uuid), error_dict)
+      return_dict = {
+        'uuid': response_dict['uuid'],
+        'method': response_dict['metaRequest']['methodName'],
+        'percent': response_dict.get('percentageComplete', 0),
+        'status': response_dict['progressStatus'],
+      }
+      return (True, return_dict)
+
+    except Exception as exception:
+      self._handle_error(exception, error_dict)
+      return (False, error_dict)
+
+
   def get_tasks_status(self):
     error_dict = {}
     try:
@@ -958,25 +1042,8 @@ class NutanixRestApiClient:
       return (False, error_dict)
 
 
-  def get_task_status(self, task_uuid):
-    error_dict = {}
-    try:
-      response_dict = self._get_v08('/tasks/{}'.format(task_uuid), error_dict)
-      return_dict = {
-        'uuid': response_dict['uuid'],
-        'method': response_dict['metaRequest']['methodName'],
-        'percent': response_dict.get('percentageComplete', 0),
-        'status': response_dict['progressStatus'],
-      }
-      return (True, return_dict)
-
-    except Exception as exception:
-      self._handle_error(exception, error_dict)
-      return (False, error_dict)
-
-
 ###
-### Exception Class
+### Custome Exception Classes
 ###
 
 class IntendedException(Exception):
